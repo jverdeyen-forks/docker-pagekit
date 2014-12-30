@@ -2,8 +2,10 @@ FROM debian
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update -yqq
-RUN apt-get install -y nginx php5-fpm php5-json php5-cli php5-mysql php5-curl curl unzip git supervisor
+RUN apt-get update -y
+RUN apt-get install -y nginx php5-fpm php5-json php5-cli php5-mysql php5-curl curl unzip git supervisor && \
+    apt-get clean
+
 RUN git clone git://github.com/pagekit/pagekit.git
 
 RUN chown -R www-data:www-data /pagekit
@@ -14,8 +16,9 @@ RUN curl -sS https://getcomposer.org/installer | php
 RUN php ./composer.phar install
 
 # debug tools after composer so it does not fuck up the cache too much
-RUN apt-get install -y vim procps screen net-tools mysql-client
-RUN echo "shell /bin/bash" >> /etc/screenrc
+# RUN apt-get install -y vim procps screen net-tools mysql-client && \
+#    apt-get clean
+# RUN echo "shell /bin/bash" >> /etc/screenrc
 
 COPY vhost.conf /etc/nginx/sites-enabled/default
 COPY supervisor.conf /etc/supervisor/conf.d/supervisor.conf
