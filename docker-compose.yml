@@ -3,7 +3,7 @@ web:
     ports:
         - 80
     links:
-        - db:pagekit_db_1
+        - db
     volumes_from:
         - data
 db:
