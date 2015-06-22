@@ -1,5 +1,5 @@
 web:
-    image: ubermuda/pagekit
+    build: ./
     ports:
         - 80
     links:
@@ -7,10 +7,11 @@ web:
     volumes_from:
         - data
 db:
-    image: orchardup/mysql
+    image: tutum/mysql
     environment:
-        MYSQL_ROOT_PASSWORD: changethis
-        MYSQL_DATABASE: pagekit
+        MYSQL_PASS: root
+        MYSQL_USER: root
+        ON_CREATE_DB: pagekit
 data:
     image: busybox
     command: /bin/true

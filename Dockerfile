@@ -2,22 +2,35 @@ FROM debian:jessie
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update
-RUN apt-get install -y nginx php5-fpm php5-json php5-cli php5-mysql php5-curl unzip git supervisor
+RUN apt-get update && \
+    apt-get install -y nginx \
+    php5-fpm \
+    php5-json \
+    php5-cli \
+    php5-mysql \
+    php5-curl \
+    unzip \
+    git \
+    supervisor \
+    nodejs \
+    npm \
+    curl
 
-RUN git clone git://github.com/pagekit/pagekit.git
+RUN git clone --branch develop git://github.com/pagekit/pagekit.git
 
 RUN chown -R www-data:www-data /pagekit
 
 WORKDIR /pagekit
 
-RUN php -r "readfile('https://getcomposer.org/installer');" | php
-RUN php ./composer.phar install
+RUN curl -sS https://getcomposer.org/installer | php && \
+    mv composer.phar /usr/local/bin/composer
+RUN composer install
 
-# debug tools after composer so it does not fuck up the cache too much
-# RUN apt-get install -y vim procps screen net-tools mysql-client && \
-#    apt-get clean
-# RUN echo "shell /bin/bash" >> /etc/screenrc
+ENV PATH /opt/node/bin/:$PATH
+RUN ln -s /usr/bin/nodejs /usr/bin/node
+RUN npm install && npm install -g gulp && npm install -g bower
+RUN bower install --allow-root
+RUN gulp compile
 
 COPY vhost.conf /etc/nginx/sites-enabled/default
 COPY supervisor.conf /etc/supervisor/conf.d/supervisor.conf
